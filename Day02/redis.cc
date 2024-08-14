@@ -5,7 +5,7 @@
 
 using std::cout;
 using std::cerr;
-
+using std::string;
 // 静态全局变量，确保 waitGroup 在整个程序运行期间保持有效
 static WFFacilities::WaitGroup waitGroup(1);
 
@@ -14,7 +14,7 @@ void sighandler(int signum) {
     waitGroup.done();
 }
 
-void redisCallback(WFRedisTask *redisTask, std::string currentKey, std::string finalValue) {
+void redisCallback(WFRedisTask *redisTask, string currentKey, string finalValue) {
     // 获取任务状态和错误信息
     int state = redisTask->get_state();
     int error = redisTask->get_error();
@@ -28,8 +28,6 @@ void redisCallback(WFRedisTask *redisTask, std::string currentKey, std::string f
         break;
     case WFT_STATE_SUCCESS:
         break;
-    }
-
     // 获取 Redis 指令的执行结果
     protocol::RedisResponse *resp = redisTask->get_resp();
     protocol::RedisValue result;
@@ -46,7 +44,7 @@ void redisCallback(WFRedisTask *redisTask, std::string currentKey, std::string f
     }
 
     // 获取键对应的值
-    std::string nextKey = result.string_value();
+    string nextKey = result.string_value();
     cout << "Key: " << currentKey << " --> Value: " << nextKey << "\n";
 
     // 如果找到了最终的值
@@ -67,11 +65,11 @@ void redisCallback(WFRedisTask *redisTask, std::string currentKey, std::string f
     nextTask->start();
 }
 
-int main() {
+int main(){
     signal(SIGINT, sighandler);
 
-    std::string initialKey = "x1";
-    std::string finalValue = "100";
+    string initialKey = "x1";
+    string finalValue = "100";
 
     // 创建初始的 Redis GET 任务
     WFRedisTask *redisTask = WFTaskFactory::create_redis_task(
@@ -85,7 +83,5 @@ int main() {
 
     waitGroup.wait();
     cout << "finished!\n";
-
-    return 0;
 }
 
