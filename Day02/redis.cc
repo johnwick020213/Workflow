@@ -64,8 +64,10 @@ void redisCallback(WFRedisTask *redisTask, string currentKey, string finalValue)
     nextReq->set_request("GET", {nextKey});
     nextTask->start();
 }
+}
 
-int main(){
+int main()
+{
     signal(SIGINT, sighandler);
 
     string initialKey = "x1";
